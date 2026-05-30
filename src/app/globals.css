@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@theme {
+  /* Surfaces — papier chaud, jamais de blanc pur */
+  --color-paper: oklch(0.988 0.005 85);
+  --color-surface: oklch(0.998 0.0015 85);
+  --color-sunk: oklch(0.972 0.006 85);
+
+  /* Encre — texte tinté vers le bleu froid pour la tension papier chaud / encre froide */
+  --color-ink: oklch(0.27 0.018 265);
+  --color-ink-soft: oklch(0.46 0.016 265);
+  --color-ink-faint: oklch(0.605 0.012 265);
+
+  /* Filets */
+  --color-rule: oklch(0.9 0.006 265);
+  --color-rule-strong: oklch(0.8 0.009 265);
+
+  /* Accent — bleu acier désaturé, sélection et action primaire uniquement */
+  --color-accent: oklch(0.43 0.085 245);
+  --color-accent-soft: oklch(0.955 0.017 245);
+
+  /* Sémantique statut */
+  --color-admis: oklch(0.5 0.082 150);
+  --color-admis-soft: oklch(0.957 0.026 150);
+  --color-refuse: oklch(0.53 0.13 33);
+  --color-refuse-soft: oklch(0.957 0.032 45);
+  --color-lock: oklch(0.5 0.058 75);
+  --color-lock-soft: oklch(0.955 0.03 80);
+
+  --font-serif: var(--font-source-serif), Georgia, "Times New Roman", serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "kern";
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Chiffres alignés pour les colonnes de notes */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-scrim {
+  animation: scrim-in 160ms ease-out;
+}
+
+.animate-sheet {
+  animation: sheet-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-scrim,
+  .animate-sheet {
+    animation: none;
+  }
+}
