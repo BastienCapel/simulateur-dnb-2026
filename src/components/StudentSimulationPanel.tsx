@@ -5,7 +5,6 @@ import type { ExamSimulation, Student } from "@/types/student";
 import { TARGET_THRESHOLDS, TERMINAL_EXAM_FIELDS } from "@/lib/dnbRules";
 import {
   calculateDnbResult,
-  calculateRequiredOralGrade,
   calculateRequiredTerminalAverage,
   calculateScienceGrade,
 } from "@/lib/dnbCalculator";
@@ -25,13 +24,6 @@ const formatRequirement = (value: number | null) => {
   if (value === null) return "Non calculable";
   if (value <= 0) return "Acquis par le contrôle continu";
   if (value > 20) return "Impossible (> 20)";
-  return formatGrade(value);
-};
-
-const formatOralRequirement = (value: number | null) => {
-  if (value === null) return "Dépend des notes manquantes";
-  if (value <= 0) return "Déjà atteint";
-  if (value > 20) return "Impossible par le seul oral";
   return formatGrade(value);
 };
 
@@ -237,29 +229,6 @@ export function StudentSimulationPanel({
             </table>
           </div>
 
-          <div>
-            <h3 className="border-b border-rule pb-2 font-serif text-base font-semibold text-ink">
-              Oral minimal (notes saisies constantes)
-            </h3>
-            <table className="mt-1 w-full text-sm">
-              <tbody>
-                {TARGET_THRESHOLDS.map((target) => (
-                  <tr key={target.value} className="border-b border-rule/60">
-                    <td className="py-1.5 pr-3 text-ink-soft">{target.label}</td>
-                    <td className="py-1.5 text-right font-medium text-ink tnum">
-                      {formatOralRequirement(
-                        calculateRequiredOralGrade(
-                          result.continuousAssessmentAverage,
-                          { ...simulation, oral: undefined },
-                          target.value,
-                        ),
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </section>
 
         {/* Actions */}
