@@ -107,6 +107,7 @@ function AccessGate({ children }: { children: (logout: () => void) => ReactNode 
           {error ? <p className="text-sm font-medium text-refuse">{error}</p> : null}
           <button
             type="submit"
+            style={{ color: "#ffffff" }}
             className="inline-flex h-11 w-full items-center justify-center border border-accent bg-accent px-4 text-sm font-semibold text-white transition-colors hover:bg-ink hover:border-ink"
           >
             Accéder au simulateur
