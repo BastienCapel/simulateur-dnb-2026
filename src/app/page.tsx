@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, ReactNode, useMemo, useState, useSyncExternalStore } from "react";
-import { FileSpreadsheet, LockKeyhole, Search } from "lucide-react";
+import { FileSpreadsheet, LockKeyhole, LogOut, Search } from "lucide-react";
 import { KeyFigures } from "@/components/KeyFigures";
 import { Modal } from "@/components/Modal";
 import { RulesExplanation } from "@/components/RulesExplanation";
@@ -43,7 +43,7 @@ const mentionOptions = [
   "Non attribuée",
 ];
 
-function AccessGate({ children }: { children: ReactNode }) {
+function AccessGate({ children }: { children: (logout: () => void) => ReactNode }) {
   const storedAccess = useSyncExternalStore(subscribeToAccess, getStoredAccess, getServerAccess);
   const [sessionAccess, setSessionAccess] = useState(false);
   const [password, setPassword] = useState("");
@@ -63,8 +63,15 @@ function AccessGate({ children }: { children: ReactNode }) {
     setError("Mot de passe incorrect.");
   };
 
+  const logout = () => {
+    window.localStorage.removeItem(ACCESS_STORAGE_KEY);
+    setSessionAccess(false);
+    setPassword("");
+    setError("");
+  };
+
   if (isUnlocked) {
-    return children;
+    return children(logout);
   }
 
   return (
@@ -181,6 +188,7 @@ export default function Home() {
 
   return (
     <AccessGate>
+      {(logout) => (
     <main className="min-h-screen">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-5 py-8 sm:px-8 lg:py-10">
         {/* En-tête « relevé officiel » */}
@@ -207,6 +215,14 @@ export default function Home() {
               >
                 <FileSpreadsheet aria-hidden="true" className="h-4 w-4" />
                 Exporter Excel
+              </button>
+              <button
+                type="button"
+                onClick={logout}
+                className="inline-flex shrink-0 items-center gap-2 border border-rule bg-surface px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:border-refuse hover:bg-refuse hover:text-white"
+              >
+                <LogOut aria-hidden="true" className="h-4 w-4" />
+                Déconnexion
               </button>
             </div>
           </div>
@@ -319,6 +335,7 @@ export default function Home() {
         ) : null}
       </Modal>
     </main>
+      )}
     </AccessGate>
   );
 }
