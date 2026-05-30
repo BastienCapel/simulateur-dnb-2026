@@ -12,7 +12,6 @@ import {
 import { formatGrade } from "@/lib/format";
 import { exportStudentExcel } from "@/lib/excelExport";
 import { GradeInput } from "@/components/GradeInput";
-import { PdfExportButton } from "@/components/PdfExportButton";
 
 type StudentSimulationPanelProps = {
   student: Student;
@@ -281,7 +280,6 @@ export function StudentSimulationPanel({
               <FileSpreadsheet aria-hidden="true" className="h-4 w-4" />
               Excel
             </button>
-            <PdfExportButton student={student} simulation={simulation} result={result} />
           </div>
         </div>
       </div>
