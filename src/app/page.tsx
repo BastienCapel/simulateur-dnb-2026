@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { FileSpreadsheet, Search } from "lucide-react";
+import { FormEvent, ReactNode, useMemo, useState, useSyncExternalStore } from "react";
+import { FileSpreadsheet, LockKeyhole, Search } from "lucide-react";
 import { KeyFigures } from "@/components/KeyFigures";
 import { Modal } from "@/components/Modal";
 import { RulesExplanation } from "@/components/RulesExplanation";
@@ -14,6 +14,13 @@ import { MENTION_LABELS } from "@/lib/dnbRules";
 import type { ExamSimulation, Student } from "@/types/student";
 
 type StatusFilter = "all" | "admis" | "non_admis" | "incomplet";
+
+const ACCESS_PASSWORD = "DNB-LFJP-2026";
+const ACCESS_STORAGE_KEY = "simulateur-dnb-2026-access";
+const subscribeToAccess = () => () => {};
+const getStoredAccess = () =>
+  typeof window !== "undefined" && window.localStorage.getItem(ACCESS_STORAGE_KEY) === "granted";
+const getServerAccess = () => false;
 
 function getDefaultSimulation(student: Student): ExamSimulation {
   return {
@@ -35,6 +42,73 @@ const mentionOptions = [
   MENTION_LABELS.tresBienFelicitations,
   "Non attribuée",
 ];
+
+function AccessGate({ children }: { children: ReactNode }) {
+  const storedAccess = useSyncExternalStore(subscribeToAccess, getStoredAccess, getServerAccess);
+  const [sessionAccess, setSessionAccess] = useState(false);
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const isUnlocked = storedAccess || sessionAccess;
+
+  const submitPassword = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (password.trim() === ACCESS_PASSWORD) {
+      window.localStorage.setItem(ACCESS_STORAGE_KEY, "granted");
+      setSessionAccess(true);
+      setError("");
+      return;
+    }
+
+    setError("Mot de passe incorrect.");
+  };
+
+  if (isUnlocked) {
+    return children;
+  }
+
+  return (
+    <main className="flex min-h-screen items-center justify-center px-5 py-10">
+      <section className="w-full max-w-sm border border-rule bg-surface p-6 shadow-sm sm:p-8">
+        <div className="mb-6 border-b border-rule pb-5">
+          <div className="mb-4 flex h-11 w-11 items-center justify-center border border-rule bg-paper text-accent">
+            <LockKeyhole aria-hidden="true" className="h-5 w-5" />
+          </div>
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-ink-faint">
+            Accès enseignants
+          </p>
+          <h1 className="mt-2 font-serif text-3xl font-semibold leading-tight text-ink">
+            Simulateur DNB 2026
+          </h1>
+        </div>
+
+        <form onSubmit={submitPassword} className="space-y-4">
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
+            Mot de passe
+            <input
+              type="password"
+              value={password}
+              onChange={(event) => {
+                setPassword(event.target.value);
+                setError("");
+              }}
+              autoComplete="current-password"
+              autoFocus
+              className="h-11 border border-rule bg-paper px-3 text-ink outline-none transition-colors focus:border-accent focus:ring-2 focus:ring-accent/15"
+            />
+          </label>
+          {error ? <p className="text-sm font-medium text-refuse">{error}</p> : null}
+          <button
+            type="submit"
+            className="inline-flex h-11 w-full items-center justify-center border border-accent bg-accent px-4 text-sm font-semibold text-paper transition-colors hover:bg-ink hover:border-ink"
+          >
+            Accéder au simulateur
+          </button>
+        </form>
+      </section>
+    </main>
+  );
+}
 
 export default function Home() {
   const [simulations, setSimulations] = useState<Record<string, ExamSimulation>>(() =>
@@ -106,6 +180,7 @@ export default function Home() {
     "h-10 border border-rule bg-surface px-3 text-ink outline-none transition-colors focus:border-accent focus:ring-2 focus:ring-accent/15";
 
   return (
+    <AccessGate>
     <main className="min-h-screen">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-5 py-8 sm:px-8 lg:py-10">
         {/* En-tête « relevé officiel » */}
@@ -244,5 +319,6 @@ export default function Home() {
         ) : null}
       </Modal>
     </main>
+    </AccessGate>
   );
 }
