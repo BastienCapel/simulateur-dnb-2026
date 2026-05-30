@@ -12,6 +12,9 @@ const sourceSerif = Source_Serif_4({
 export const metadata: Metadata = {
   title: "Simulateur DNB 2026",
   description: "Projection des résultats au Diplôme national du brevet 2026.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
